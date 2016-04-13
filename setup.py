@@ -18,7 +18,13 @@ setup(
         'boto3',
         ],
     extras_require={
-        'test': ['tox', 'pytest', 'pytest-cov'],
+        'test': [
+            'tox',
+            'pytest',
+            'pytest-cov',
+            'moto',
+            'mock',
+            ],
         'dev': [
             'zest.releaser[recommended]',
             'pylama',

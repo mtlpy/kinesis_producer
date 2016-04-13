@@ -39,7 +39,7 @@ Send records aggregated up to 100KB, 200ms and joined with '\\n':
    for record in records:
        k.send(record)
 
-   k.stop()
+   k.close()
    k.join()
 
 

@@ -32,6 +32,7 @@ class RawBuffer(object):
 
     def flush(self):
         """Return the buffer content and close the buffer."""
+        assert self._buffer is not None, 'Buffer is closed!'
         buf = self._buffer.getvalue()
         self._buffer = None
         return buf

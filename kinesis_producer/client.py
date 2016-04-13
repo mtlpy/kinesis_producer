@@ -64,18 +64,3 @@ class Client(object):
 
     def join(self):
         log.debug('Joining client')
-
-
-class DummyClient(object):
-
-    def __init__(self, delay):
-        self.delay = delay
-
-    def put_records(self, records):
-        time.sleep(self.delay)
-
-    def close(self):
-        log.debug('Closing client')
-
-    def join(self):
-        log.debug('Joining client')

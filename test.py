@@ -33,8 +33,8 @@ try:
 except KeyboardInterrupt:
     pass
 finally:
-    print ' <> STOP'
-    k.stop()
+    print ' <> CLOSE'
+    k.close()
 
     print ' <> JOIN'
     k.join()

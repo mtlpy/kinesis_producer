@@ -9,7 +9,6 @@ from .buffer import RawBuffer
 from .client import Client
 from .partitioner import random_partitioner
 from .constants import KINESIS_RECORD_MAX_SIZE
-from .exceptions import InvalidRecord
 
 log = logging.getLogger(__name__)
 
@@ -19,7 +18,9 @@ class KinesisProducer(object):
 
     def __init__(self, config):
         log.debug('Starting KinesisProducer')
+        self.config = config
         self._queue = queue.Queue()
+        self._closed = False
 
         accumulator = RecordAccumulator(RawBuffer, config)
         client = Client(config)
@@ -29,24 +30,24 @@ class KinesisProducer(object):
                               partitioner=random_partitioner)
         self._sender.daemon = True
         self._sender.start()
-        self._closed = False
 
     def send(self, record):
         """Publish a record to Kinesis.
 
         Don't block. Record must be bytes type.
         """
-        assert not self._closed, "KinesisProducer stopped but called anyway"
+        assert not self._closed, "KinesisProducer closed but called anyway"
 
         if not isinstance(record, six.binary_type):
-            raise InvalidRecord("Record must be bytes type")
+            raise ValueError("Record must be bytes type")
 
-        if len(record) > KINESIS_RECORD_MAX_SIZE:
-            raise InvalidRecord("Record is larger than max record size")
+        record_size = len(record) + len(self.config['record_delimiter'])
+        if record_size > KINESIS_RECORD_MAX_SIZE:
+            raise ValueError("Record is larger than max record size")
 
         self._queue.put(record)
 
-    def stop(self):
+    def close(self):
         if self._closed:
             return
         log.debug('Closing KinesisProducer')
@@ -54,7 +55,7 @@ class KinesisProducer(object):
         self._closed = True
 
     def join(self):
-        self.stop()
+        self.close()
         log.debug('Joining KinesisProducer')
         self._queue.join()
         log.debug('KinesisProducer record queue was joined')

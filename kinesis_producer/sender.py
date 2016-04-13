@@ -49,8 +49,12 @@ class Sender(threading.Thread):
         except queue.Empty:
             record = None
         else:
-            while not self._accumulator.try_append(record):
+            success = self._accumulator.try_append(record)
+            if not success:
                 self.flush()
+                success = self._accumulator.try_append(record)
+                assert success, "Failed to accumulate even after flushing"
+
             self.queue.task_done()
 
         is_ready = self._accumulator.is_ready()
