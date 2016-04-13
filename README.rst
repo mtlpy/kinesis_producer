@@ -6,6 +6,17 @@ Python producer for AWS Kinesis Stream with record aggregation.
 
 It uses Boto 3 and is tested on Python 2.7 and 3.4/3.5.
 
+* PyPI: https://pypi.python.org/pypi/kinesis_producer
+* Code: https://github.com/ludia/kinesis_producer
+* |travis|
+* |coveralls|
+
+.. |travis| image:: https://travis-ci.org/ludia/kinesis_producer.svg?branch=master
+   :target: https://travis-ci.org/ludia/kinesis_producer
+
+.. |coveralls| image:: https://coveralls.io/repos/github/ludia/kinesis_producer/badge.svg?branch=master
+   :target: https://coveralls.io/github/ludia/kinesis_producer?branch=master
+
 
 Install
 =======

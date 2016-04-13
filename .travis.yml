@@ -1,0 +1,20 @@
+language: python
+
+python:
+    - 2.7
+    - 3.4
+    - 3.5
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+
+install:
+    - pip install tox coveralls
+    - pip install .
+
+script:
+  - tox -e `if [ "$TRAVIS_PYTHON_VERSION" == "pypy" ]; then echo pypy; else echo py${TRAVIS_PYTHON_VERSION/./}; fi`
+
+after_success:
+  - coveralls
