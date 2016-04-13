@@ -28,24 +28,24 @@ def test_send_records(kinesis):
     }
     client = Client(config)
 
-    record1 = ('data', 'part1')
-    record2 = ('datadatadata', 'part2')
+    record1 = (b'data', 'part1')
+    record2 = (b'datadatadata', 'part2')
     client.put_records([record1, record2])
 
     records = kinesis.read_records_from_stream()
 
     assert len(records) == 2
     assert records[0]['PartitionKey'] == 'part1'
-    assert records[0]['Data'] == 'data'
+    assert records[0]['Data'] == b'data'
 
     assert records[1]['PartitionKey'] == 'part2'
-    assert records[1]['Data'] == 'datadatadata'
+    assert records[1]['Data'] == b'datadatadata'
 
 
 def test_send_records_handle_error(config, kinesis):
     client = Client(config)
 
-    record = ('data', 'part1')
+    record = (b'data', 'part1')
 
     with mock.patch.object(client, 'connection') as m_conn:
         m_conn.put_records.side_effect = Exception()

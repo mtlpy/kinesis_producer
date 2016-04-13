@@ -1,4 +1,4 @@
-import Queue
+from six.moves import queue
 
 import mock
 
@@ -12,11 +12,11 @@ def partitioner(record):
 
 
 def test_init(config):
-    queue = Queue.Queue()
+    q = queue.Queue()
     accumulator = RecordAccumulator(RawBuffer, config)
     client = mock.Mock()
 
-    sender = Sender(queue=queue, accumulator=accumulator,
+    sender = Sender(queue=q, accumulator=accumulator,
                     client=client, partitioner=partitioner)
     sender.start()
     sender.close()
@@ -24,49 +24,49 @@ def test_init(config):
 
 
 def test_flush(config):
-    queue = Queue.Queue()
+    q = queue.Queue()
     accumulator = RecordAccumulator(RawBuffer, config)
     client = mock.Mock()
 
-    sender = Sender(queue=queue, accumulator=accumulator,
+    sender = Sender(queue=q, accumulator=accumulator,
                     client=client, partitioner=partitioner)
 
     sender.flush()
     assert not client.put_records.called
 
-    accumulator.try_append('-')
+    accumulator.try_append(b'-')
 
     sender.flush()
-    expected_records = [('-\n', 4)]
+    expected_records = [(b'-\n', 4)]
     client.put_records.assert_called_once_with(expected_records)
 
 
 def test_accumulate(config):
-    queue = Queue.Queue()
+    q = queue.Queue()
     accumulator = RecordAccumulator(RawBuffer, config)
     client = mock.Mock()
 
-    sender = Sender(queue=queue, accumulator=accumulator,
+    sender = Sender(queue=q, accumulator=accumulator,
                     client=client, partitioner=partitioner)
 
     sender.run_once()
     assert not accumulator.has_records()
 
-    queue.put('-')
+    q.put(b'-')
 
     sender.run_once()
     assert accumulator.has_records()
 
 
 def test_flush_if_ready(config):
-    queue = Queue.Queue()
+    q = queue.Queue()
     accumulator = RecordAccumulator(RawBuffer, config)
     client = mock.Mock()
 
-    sender = Sender(queue=queue, accumulator=accumulator,
+    sender = Sender(queue=q, accumulator=accumulator,
                     client=client, partitioner=partitioner)
 
-    accumulator.try_append('-' * 200)
+    accumulator.try_append(b'-' * 200)
     sender.run_once()
 
     assert client.put_records.called
@@ -74,15 +74,15 @@ def test_flush_if_ready(config):
 
 
 def test_flush_if_full(config):
-    queue = Queue.Queue()
+    q = queue.Queue()
     accumulator = RecordAccumulator(RawBuffer, config)
     client = mock.Mock()
 
-    sender = Sender(queue=queue, accumulator=accumulator,
+    sender = Sender(queue=q, accumulator=accumulator,
                     client=client, partitioner=partitioner)
 
-    accumulator.try_append('-' * (1024 * 1024 - 1))
-    queue.put('-' * 50)
+    accumulator.try_append(b'-' * (1024 * 1024 - 1))
+    q.put(b'-' * 50)
     sender.run_once()
 
     assert client.put_records.called

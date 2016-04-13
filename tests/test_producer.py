@@ -22,7 +22,7 @@ def test_send_invalid_record(kinesis, config):
         c.send(123)
 
     with pytest.raises(ValueError):
-        c.send('-' * (1024 * 1024 + 1))
+        c.send(b'-' * (1024 * 1024 + 1))
 
     c.close()
     c.join()
@@ -30,7 +30,7 @@ def test_send_invalid_record(kinesis, config):
 
 def test_send_record_size_limit(kinesis, config):
     c = KinesisProducer(config)
-    c.send('-' * (1024 * 1024 - 1))
+    c.send(b'-' * (1024 * 1024 - 1))
 
     c.close()
     c.join()
@@ -38,12 +38,12 @@ def test_send_record_size_limit(kinesis, config):
 
 def test_send_record_immediate(kinesis, config):
     c = KinesisProducer(config)
-    c.send('-' * 200)
+    c.send(b'-' * 200)
     time.sleep(0.1)  # Let the I/O thread do its job
 
     records = kinesis.read_records_from_stream()
     assert len(records) == 1
-    assert records[0]['Data'] == '-' * 200 + '\n'
+    assert records[0]['Data'] == b'-' * 200 + b'\n'
 
     c.close()
     c.join()
@@ -51,7 +51,7 @@ def test_send_record_immediate(kinesis, config):
 
 def test_send_record_linger(kinesis, config):
     c = KinesisProducer(config)
-    c.send('-' * 50)
+    c.send(b'-' * 50)
     time.sleep(0.1)  # Let the I/O thread do its job
 
     records = kinesis.read_records_from_stream()
@@ -61,7 +61,7 @@ def test_send_record_linger(kinesis, config):
 
     records = kinesis.read_records_from_stream()
     assert len(records) == 1
-    assert records[0]['Data'] == '-' * 50 + '\n'
+    assert records[0]['Data'] == b'-' * 50 + b'\n'
 
     c.close()
     c.join()
@@ -69,10 +69,10 @@ def test_send_record_linger(kinesis, config):
 
 def test_records_are_not_lost(kinesis, config):
     c = KinesisProducer(config)
-    c.send('-')
+    c.send(b'-')
     c.close()
     c.join()
 
     records = kinesis.read_records_from_stream()
     assert len(records) == 1
-    assert records[0]['Data'] == '-\n'
+    assert records[0]['Data'] == b'-\n'

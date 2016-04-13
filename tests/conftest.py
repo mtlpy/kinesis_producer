@@ -12,7 +12,7 @@ def config():
     config = dict(
         buffer_size_limit=100,
         buffer_time_limit=0.2,
-        record_delimiter='\n',
+        record_delimiter=b'\n',
         stream_name=TEST_STREAM_NAME,
         kinesis_max_retries=3,
         aws_region='us-east-1',
