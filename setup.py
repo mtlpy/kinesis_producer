@@ -4,9 +4,9 @@ from setuptools import setup, find_packages
 setup(
     name='kinesis_producer',
     version='0.0.1.dev0',
-    description='REPLACEME',
+    description='Producer for AWS Kinesis Stream with record aggregation',
     long_description=open('README.rst').read(),
-    keywords='REPLACEME',
+    keywords='kinesis kafka producer client',
     author='Pior Bastida',
     author_email='pbastida@ludia.com',
     url='https://github.com/pior/kinesis_producer',
