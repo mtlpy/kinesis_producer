@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.1 (unreleased)
+0.1 (2016-04-14)
 ----------------
 
 - Initial version with simple aggregation
