@@ -4,7 +4,7 @@ Changelog
 0.2 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Use Kinesis PutRecord API rather than PutRecords
 
 
 0.1 (2016-04-14)

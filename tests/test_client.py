@@ -20,7 +20,7 @@ def test_close(kinesis, config):
     c.join()
 
 
-def test_send_records(kinesis):
+def test_send_record(kinesis):
     config = {
         'aws_region': 'us-east-1',
         'stream_name': 'STREAM_NAME',
@@ -28,18 +28,14 @@ def test_send_records(kinesis):
     }
     client = Client(config)
 
-    record1 = (b'data', 'part1')
-    record2 = (b'datadatadata', 'part2')
-    client.put_records([record1, record2])
+    record = (b'data', 'part')
+    client.put_record(record)
 
     records = kinesis.read_records_from_stream()
 
-    assert len(records) == 2
-    assert records[0]['PartitionKey'] == 'part1'
+    assert len(records) == 1
+    assert records[0]['PartitionKey'] == 'part'
     assert records[0]['Data'] == b'data'
-
-    assert records[1]['PartitionKey'] == 'part2'
-    assert records[1]['Data'] == b'datadatadata'
 
 
 def test_send_records_handle_error(config, kinesis):
@@ -48,9 +44,9 @@ def test_send_records_handle_error(config, kinesis):
     record = (b'data', 'part1')
 
     with mock.patch.object(client, 'connection') as m_conn:
-        m_conn.put_records.side_effect = Exception()
+        m_conn.put_record.side_effect = Exception()
 
-        client.put_records([record])
+        client.put_record(record)
 
 
 def test_retry_logic_call():
