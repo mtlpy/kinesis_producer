@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import logging
-# import time
+import time
 
 from kinesis_producer import KinesisProducer
 
@@ -11,25 +11,27 @@ logging.getLogger('botocore').setLevel(logging.WARNING)
 log = logging.getLogger(__name__)
 
 config = dict(
-    buffer_size_limit=100000,
+    aws_region='us-east-1',
+    buffer_size_limit=200000,
     buffer_time_limit=0.2,
+    kinesis_concurrency=4,
+    kinesis_max_retries=10,
     record_delimiter='\n',
     stream_name='jz-python-devlocal',
-    kinesis_max_retries=3,
-    aws_region='us-east-1',
     )
 
 k = KinesisProducer(config=config)
 
-payload = '{MSG:%%05i %s}' % ('BlaBl' * 198)
+payload = '{MSG:%%05i %s}' % ('X' * 1000)
 
 try:
     print ' <> MSGS'
-    for msg_id in range(1500):
+    for msg_id in range(50000):
         record = payload % msg_id
         k.send(record)
-        # time.sleep(0.0001)
+        # time.sleep(0.2)
 
+    # time.sleep(5)
 except KeyboardInterrupt:
     pass
 finally:

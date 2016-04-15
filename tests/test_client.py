@@ -1,8 +1,10 @@
+import time
+
 import mock
 import pytest
 
 import botocore.exceptions
-from kinesis_producer.client import Client, call_and_retry
+from kinesis_producer.client import Client, ThreadPoolClient, call_and_retry
 
 
 def test_init(kinesis):
@@ -97,3 +99,51 @@ def test_retry_logic_throughput_error_give_up():
 
     with pytest.raises(botocore.exceptions.ClientError):
         call_and_retry(func, 2, arg='ARG')
+
+
+TEST_DATA = [('data-%0i' % i).encode() for i in range(20)]
+
+
+def test_threadpool_send_record(kinesis):
+    config = {
+        'aws_region': 'us-east-1',
+        'stream_name': 'STREAM_NAME',
+        'kinesis_max_retries': 3,
+        'kinesis_concurrency': 2,
+    }
+    client = ThreadPoolClient(config)
+
+    for data in TEST_DATA:
+        record = (data, 'part')
+        client.put_record(record)
+
+    client.close()
+    client.join()
+    records = kinesis.read_records_from_stream()
+
+    assert len(TEST_DATA) == len(records)
+    record_data = [r['Data'] for r in records]
+    assert sorted(TEST_DATA) == sorted(record_data)
+
+
+def test_threadpool_async(kinesis):
+    config = {
+        'aws_region': 'us-east-1',
+        'stream_name': 'STREAM_NAME',
+        'kinesis_max_retries': 3,
+        'kinesis_concurrency': 2,
+    }
+    client = ThreadPoolClient(config)
+
+    for data in TEST_DATA:
+        record = (data, 'part')
+        client.put_record(record)
+
+    time.sleep(1)
+
+    records = kinesis.read_records_from_stream()
+
+    client.close()
+    client.join()
+
+    assert len(TEST_DATA) == len(records)

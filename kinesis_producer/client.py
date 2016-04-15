@@ -1,5 +1,6 @@
 import logging
 import time
+from multiprocessing.pool import ThreadPool
 
 import boto3
 import botocore
@@ -65,3 +66,23 @@ class Client(object):
 
     def join(self):
         log.debug('Joining client')
+
+
+class ThreadPoolClient(Client):
+    """Thread pool based asynchronous Kinesis client."""
+
+    def __init__(self, config):
+        super(ThreadPoolClient, self).__init__(config)
+        self.pool = ThreadPool(processes=config['kinesis_concurrency'])
+
+    def put_record(self, records):
+        task_func = super(ThreadPoolClient, self).put_record
+        self.pool.apply_async(task_func, args=[records])
+
+    def close(self):
+        super(ThreadPoolClient, self).close()
+        self.pool.close()
+
+    def join(self):
+        super(ThreadPoolClient, self).join()
+        self.pool.join()

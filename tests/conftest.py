@@ -10,12 +10,13 @@ TEST_STREAM_NAME = 'STREAM_NAME'
 @pytest.fixture(scope="module")
 def config():
     config = dict(
+        aws_region='us-east-1',
         buffer_size_limit=100,
         buffer_time_limit=0.2,
+        kinesis_concurrency=1,
+        kinesis_max_retries=3,
         record_delimiter=b'\n',
         stream_name=TEST_STREAM_NAME,
-        kinesis_max_retries=3,
-        aws_region='us-east-1',
     )
     return config
 

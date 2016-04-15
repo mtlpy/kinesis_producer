@@ -37,12 +37,13 @@ Send records aggregated up to 100KB, 200ms and joined with '\\n':
    from kinesis_producer import KinesisProducer
 
    config = dict(
+       aws_region='us-east-1',
        buffer_size_limit=100000,
        buffer_time_limit=0.2,
+       kinesis_concurrency=1,
+       kinesis_max_retries=10,
        record_delimiter='\n',
        stream_name='KINESIS_STREAM_NAME',
-       kinesis_max_retries=3,
-       aws_region='us-east-1',
        )
 
    k = KinesisProducer(config=config)
@@ -57,12 +58,16 @@ Send records aggregated up to 100KB, 200ms and joined with '\\n':
 Config
 ======
 
-- ``stream_name``: Name of the Kinesis Stream
-- ``kinesis_max_retries``: Number of Kinesis put_records call attempt before giving up
-- ``aws_region``: AWS region for Kinesis calls
-- ``buffer_size_limit``: Approximative size limit for record aggregation
-- ``record_delimiter``: Delimiter for record aggregation
-- ``buffer_time_limit``: Approximative time limit for record aggregation
+:aws_region: AWS region for Kinesis calls
+:buffer_size_limit: Approximative size limit for record aggregation
+:buffer_time_limit: Approximative time limit for record aggregation
+:kinesis_concurrency:
+   Set the concurrency level for Kinesis calls. Set to 1 for no
+   concurrency. Set to 2 and more to use a thread pool.
+:kinesis_max_retries:
+   Number of Kinesis put_records call attempt before giving up
+:record_delimiter: Delimiter for record aggregation
+:stream_name: Name of the Kinesis Stream
 
 
 Copyright and license
