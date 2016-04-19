@@ -6,7 +6,7 @@ from six.moves import queue
 from .sender import Sender
 from .accumulator import RecordAccumulator
 from .buffer import RawBuffer
-from .client import Client
+from .client import Client, ThreadPoolClient
 from .partitioner import random_partitioner
 from .constants import KINESIS_RECORD_MAX_SIZE
 
@@ -23,7 +23,10 @@ class KinesisProducer(object):
         self._closed = False
 
         accumulator = RecordAccumulator(RawBuffer, config)
-        client = Client(config)
+        if config['kinesis_concurrency'] == 1:
+            client = Client(config)
+        else:
+            client = ThreadPoolClient(config)
         self._sender = Sender(queue=self._queue,
                               accumulator=accumulator,
                               client=client,

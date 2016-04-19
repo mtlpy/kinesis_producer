@@ -32,13 +32,13 @@ def test_flush(config):
                     client=client, partitioner=partitioner)
 
     sender.flush()
-    assert not client.put_records.called
+    assert not client.put_record.called
 
     accumulator.try_append(b'-')
 
     sender.flush()
-    expected_records = [(b'-\n', 4)]
-    client.put_records.assert_called_once_with(expected_records)
+    expected_record = (b'-\n', 4)
+    client.put_record.assert_called_once_with(expected_record)
 
 
 def test_accumulate(config):
@@ -69,7 +69,7 @@ def test_flush_if_ready(config):
     accumulator.try_append(b'-' * 200)
     sender.run_once()
 
-    assert client.put_records.called
+    assert client.put_record.called
     assert not accumulator.has_records()
 
 
@@ -85,5 +85,5 @@ def test_flush_if_full(config):
     q.put(b'-' * 50)
     sender.run_once()
 
-    assert client.put_records.called
+    assert client.put_record.called
     assert accumulator.has_records()

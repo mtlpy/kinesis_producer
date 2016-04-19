@@ -69,8 +69,7 @@ class Sender(threading.Thread):
         if record_data:
             log.debug('Flushing to client (length: %i)', len(record_data))
             record = (record_data, self._partitioner(record_data))
-            records = [record]
-            self._client.put_records(records)
+            self._client.put_record(record)
 
     def close(self):
         log.debug("Closing kinesis producer I/O thread")

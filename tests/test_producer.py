@@ -76,3 +76,15 @@ def test_records_are_not_lost(kinesis, config):
     records = kinesis.read_records_from_stream()
     assert len(records) == 1
     assert records[0]['Data'] == b'-\n'
+
+
+def test_send_with_threadpool_client(kinesis, config):
+    config['kinesis_concurrency'] = 2
+    c = KinesisProducer(config)
+    c.send(b'-')
+    c.close()
+    c.join()
+
+    records = kinesis.read_records_from_stream()
+    assert len(records) == 1
+    assert records[0]['Data'] == b'-\n'

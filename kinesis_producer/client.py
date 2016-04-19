@@ -1,5 +1,6 @@
 import logging
 import time
+from multiprocessing.pool import ThreadPool
 
 import boto3
 import botocore
@@ -45,17 +46,18 @@ class Client(object):
         self.max_retries = config['kinesis_max_retries']
         self.connection = get_connection(config['aws_region'])
 
-    def put_records(self, records):
+    def put_record(self, record):
         """Send records to Kinesis API.
 
         Records is a list of tuple like (data, partition_key).
         """
-        records = [{'Data': r, 'PartitionKey': p} for r, p in records]
+        data, partition_key = record
 
-        log.debug('Sending records: %s', str(records)[:100])
+        log.debug('Sending record: %s', data[:100])
         try:
-            call_and_retry(self.connection.put_records, self.max_retries,
-                           StreamName=self.stream, Records=records)
+            call_and_retry(self.connection.put_record, self.max_retries,
+                           StreamName=self.stream, Data=data,
+                           PartitionKey=partition_key)
         except:
             log.exception('Failed to send records to Kinesis')
 
@@ -64,3 +66,23 @@ class Client(object):
 
     def join(self):
         log.debug('Joining client')
+
+
+class ThreadPoolClient(Client):
+    """Thread pool based asynchronous Kinesis client."""
+
+    def __init__(self, config):
+        super(ThreadPoolClient, self).__init__(config)
+        self.pool = ThreadPool(processes=config['kinesis_concurrency'])
+
+    def put_record(self, records):
+        task_func = super(ThreadPoolClient, self).put_record
+        self.pool.apply_async(task_func, args=[records])
+
+    def close(self):
+        super(ThreadPoolClient, self).close()
+        self.pool.close()
+
+    def join(self):
+        super(ThreadPoolClient, self).join()
+        self.pool.join()
