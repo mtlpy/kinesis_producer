@@ -9,7 +9,7 @@ setup(
     keywords='kinesis kafka producer client',
     author='Pior Bastida',
     author_email='pbastida@ludia.com',
-    url='https://github.com/pior/kinesis_producer',
+    url='https://github.com/ludia/kinesis_producer',
     license='MIT',
     packages=find_packages(exclude=['tests']),
     zip_safe=False,
