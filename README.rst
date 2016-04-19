@@ -58,16 +58,28 @@ Send records aggregated up to 100KB, 200ms and joined with '\\n':
 Config
 ======
 
-:aws_region: AWS region for Kinesis calls
-:buffer_size_limit: Approximative size limit for record aggregation
-:buffer_time_limit: Approximative time limit for record aggregation
+:aws_region: AWS region for Kinesis calls (like us-east-1)
+:buffer_size_limit:
+   Approximative size limit for record aggregation (in bytes)
+:buffer_time_limit:
+   Approximative time limit for record aggregation (in seconds)
 :kinesis_concurrency:
    Set the concurrency level for Kinesis calls. Set to 1 for no
    concurrency. Set to 2 and more to use a thread pool.
 :kinesis_max_retries:
-   Number of Kinesis put_records call attempt before giving up
+   Number of Kinesis put_records call attempt before giving up.
+   This number should be between 4 and 10 if you want to handle
+   temporary ProvisionedThroughputExceeded errors.
 :record_delimiter: Delimiter for record aggregation
 :stream_name: Name of the Kinesis Stream
+
+
+Kinesis retries
+---------------
+
+Kinesis calls are retried for ProvisionedThroughputExceeded error
+only. Retry use an exponential backoff logic (0.1s, 0.2s, 0.4s, 0.8s,
+1.60s, 3.20s, 6.40s, 12.80s, 25.60s, 51.20s, 102.40s...)
 
 
 Copyright and license
