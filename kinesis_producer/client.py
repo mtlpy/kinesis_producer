@@ -23,7 +23,7 @@ def call_and_retry(boto_function, max_retries, **kwargs):
     retries = 0
     while True:
         if retries:
-            log.warning('Retrying %s', boto_function)
+            log.warning('Retrying (%i) %s', retries, boto_function)
 
         try:
             return boto_function(**kwargs)

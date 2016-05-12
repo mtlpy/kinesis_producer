@@ -4,7 +4,7 @@ Changelog
 0.3 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Add the number of retry in the log to improve perf diagnostics
 
 
 0.2 (2016-04-19)
