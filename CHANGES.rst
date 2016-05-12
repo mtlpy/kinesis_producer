@@ -1,8 +1,8 @@
 Changelog
 =========
 
-0.3 (unreleased)
-----------------
+0.2.1 (2016-05-12)
+------------------
 
 - Add the number of retry in the log to improve perf diagnostics
 
